@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getById, update } from '@/lib/db';
+import { getAll, getById, update } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Product, ProductImage } from '@/types';
