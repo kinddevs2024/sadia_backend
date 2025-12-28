@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
 
     // Create order
     const order = create<Order>('orders', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       orderNumber: finalOrderNumber,
       status: 'PENDING',
       source: 'TELEGRAM',
@@ -94,6 +95,7 @@ export async function POST(req: NextRequest) {
     for (const item of items) {
       const product = products.find(p => p.id === item.productId)!;
       const orderItem = create<OrderItem>('orderItems', {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         orderId: order.id,
         productId: item.productId,
         size: item.size,

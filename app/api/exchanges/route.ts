@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
 
     // Создать запрос на обмен/отмену
     const exchange = create<Exchange>('exchanges', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       orderId,
       productId: productId || undefined, // null для отмены всего заказа
       reason,

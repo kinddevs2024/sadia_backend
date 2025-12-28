@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
 
     // Создаем подписку
     const subscription = create<NewsletterSubscription>('newsletterSubscriptions', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       email: email.toLowerCase(),
       createdAt: new Date().toISOString(),
     });

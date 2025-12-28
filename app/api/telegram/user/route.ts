@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
 
     // Create new mapping
     const mapping = create<TelegramUserMapping>('telegramUserMappings', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       telegramUserId,
       userId,
       role: (role || 'USER') as UserRole,

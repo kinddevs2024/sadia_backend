@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await hashPassword(password);
 
     const user = create<User>('users', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       email,
       password: hashedPassword,
       role: 'USER',

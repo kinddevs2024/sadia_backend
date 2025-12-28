@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
     const profit = costPrice ? price - costPrice : undefined;
 
     const product = create<Product>('products', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
       slug: productSlug,
       description,

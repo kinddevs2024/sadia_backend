@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const supportMessage = create<SupportMessage>('supportMessages', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       email,
       message,
       responded: false,

@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     const categorySlug = slug || name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
     const category = create<Category>('categories', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
       slug: categorySlug,
       description,

@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     const review = create<Review>('reviews', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
       text,
       rating,

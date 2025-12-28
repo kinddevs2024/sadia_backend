@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
 
     // Create payment record
     const payment = create<Payment>('payments', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       orderId,
       provider: 'TERMINAL',
       status: 'COMPLETED',

@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
     }
 
     const inventoryItem = create<Inventory>('inventory', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       productId,
       size,
       quantity: parseInt(quantity.toString()),
