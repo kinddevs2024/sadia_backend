@@ -25,7 +25,7 @@
         "bcrypt": "^5.1.1",
         "jsonwebtoken": "^9.0.2",
         "cors": "^2.8.5",
-        "node-telegram-bot-api": "^0.64.0",
+        "node-telegram-bot-api": "^0.67.0",
         "axios": "^1.7.7"
     },
     "devDependencies": {
@@ -42,9 +42,6 @@
     "overrides": {
         "rimraf": "^5.0.0",
         "glob": "^10.0.0",
-        "uuid": "^10.0.0",
-        "npmlog": "^7.0.1",
-        "gauge": "^5.0.2",
-        "are-we-there-yet": "^4.0.2"
+        "uuid": "^10.0.0"
     }
 }

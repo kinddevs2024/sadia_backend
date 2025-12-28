@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
 
     const now = new Date().toISOString();
     const coupon = create<Coupon>('coupons', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       code,
       discount: parseFloat(discount.toString()),
       discountType,
