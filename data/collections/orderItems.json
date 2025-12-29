@@ -70,5 +70,13 @@
     "quantity": 4,
     "price": 808309,
     "id": "1766925392522-3b9ji01gt"
+  },
+  {
+    "id": "1766995693216-uchxzyq9b",
+    "orderId": "1766995693214-ty4b1n48g",
+    "productId": "gen-1",
+    "size": "S, M ",
+    "quantity": 9,
+    "price": 808309
   }
 ]
