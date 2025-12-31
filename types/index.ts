@@ -96,6 +96,7 @@ export interface Review {
   text: string;
   rating: number;
   productId?: string;
+  orderId?: string;
   approved: boolean;
   createdAt: string;
   updatedAt?: string;
