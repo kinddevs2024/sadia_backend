@@ -3,6 +3,8 @@ import { getAll, getById } from '@/lib/db';
 import { requireSuperAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+export const dynamic = 'force-dynamic';
+
 // List of all collections
 const COLLECTIONS = [
   'users',

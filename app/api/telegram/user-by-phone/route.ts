@@ -3,6 +3,8 @@ import { getAll } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { User } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // Get telegramUserId by phone number
 export async function GET(req: NextRequest) {
   try {

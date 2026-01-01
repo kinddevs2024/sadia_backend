@@ -5,6 +5,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order, OrderItem, Product, Coupon } from '@/types';
 import { sendTelegramNotificationByPhone } from '@/lib/telegram-notify';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const user = requireAuth(req);

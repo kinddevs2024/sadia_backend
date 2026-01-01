@@ -4,6 +4,8 @@ import { getAll } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Exchange } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

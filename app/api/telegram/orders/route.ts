@@ -3,6 +3,8 @@ import { getAll } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // Public endpoint for Telegram bot to get user orders
 export async function GET(req: NextRequest) {
   try {

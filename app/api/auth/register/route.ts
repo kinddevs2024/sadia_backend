@@ -4,6 +4,8 @@ import { hashPassword, generateToken } from '@/lib/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { User } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const { email, password, firstName, lastName, phone, address } = await req.json();

@@ -12,6 +12,7 @@ async function seed() {
     
     const superadminPassword = await hashPassword('superadmin123');
     create<User>('users', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       email: 'superadmin@sadia.lux',
       password: superadminPassword,
       role: 'SUPERADMIN',
@@ -21,6 +22,7 @@ async function seed() {
 
     const adminPassword = await hashPassword('admin123');
     create<User>('users', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       email: 'admin@sadia.lux',
       password: adminPassword,
       role: 'ADMIN',
@@ -30,6 +32,7 @@ async function seed() {
 
     const cashierPassword = await hashPassword('cashier123');
     create<User>('users', {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       email: 'cashier@sadia.lux',
       password: cashierPassword,
       role: 'CASHIER',
@@ -55,6 +58,7 @@ async function seed() {
     const createdCategories: Category[] = [];
     for (const cat of categories) {
       const category = create<Category>('categories', {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         ...cat,
         createdAt: new Date().toISOString(),
       });

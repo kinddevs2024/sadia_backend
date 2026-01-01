@@ -3,6 +3,8 @@ import { getAll } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Coupon } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const { code } = await req.json();

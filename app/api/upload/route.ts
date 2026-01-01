@@ -5,6 +5,8 @@ import path from 'path';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+export const dynamic = 'force-dynamic';
+
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 
 // Ensure upload directory exists

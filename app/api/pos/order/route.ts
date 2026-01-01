@@ -5,6 +5,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order, OrderItem, Product } from '@/types';
 import { decreaseInventoryOnPayment } from '@/lib/inventory-utils';
 
+export const dynamic = 'force-dynamic';
+
 // Alias for /pos/orders (for compatibility with frontend)
 export async function POST(req: NextRequest) {
   try {

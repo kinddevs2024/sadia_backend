@@ -3,6 +3,8 @@ import { getAll, create } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Review } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

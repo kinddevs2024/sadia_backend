@@ -3,6 +3,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { create, getAll, update } from '@/lib/db';
 import { Order, OrderItem, Product, Coupon } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // This endpoint will be used by Telegram bot to create orders
 export async function POST(req: NextRequest) {
   try {

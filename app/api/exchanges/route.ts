@@ -4,6 +4,8 @@ import { create, getAll, getById } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Exchange, Order } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const user = requireAuth(req);

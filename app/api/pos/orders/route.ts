@@ -5,6 +5,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order, OrderItem, Product } from '@/types';
 import { decreaseInventoryOnPayment } from '@/lib/inventory-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);

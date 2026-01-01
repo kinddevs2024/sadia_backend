@@ -3,6 +3,8 @@ import { getAll, getById, create, update } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { User, Order, TelegramUserMapping, UserRole } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // Get user info by Telegram ID
 export async function GET(req: NextRequest) {
   try {

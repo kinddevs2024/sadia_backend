@@ -4,6 +4,8 @@ import { getById, update, getAll } from '@/lib/db';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Exchange, Order } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }

@@ -6,6 +6,8 @@ import { Order, OrderItem, User, Product } from '@/types';
 import { decreaseInventoryOnPayment, removeInventoryOnCompletion } from '@/lib/inventory-utils';
 import { sendTelegramNotificationByPhone } from '@/lib/telegram-notify';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }

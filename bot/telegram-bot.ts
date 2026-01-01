@@ -41,9 +41,10 @@ class SadiaTelegramBot {
   private userStates: Map<number, string>;
   private userRoles: Map<number, string>;
   private categoryMapping: Map<string, string> = new Map();
+  private sizeMapping: Map<string, { size: string; quantity: number }> = new Map();
   private userProductLists: Map<number, Product[]> = new Map(); // Список товаров для каждого пользователя
   private userCurrentProductIndex: Map<number, number> = new Map(); // Текущий индекс товара
-  private userPendingOrder: Map<number, { productId: string; size?: string }> = new Map(); // Товар ожидающий количества
+  private userPendingOrder: Map<number, { productId: string; size?: string; quantity?: number }> = new Map(); // Товар ожидающий количества
   private userCoupon: Map<number, { code: string; discount: number; discountType: string }> = new Map(); // Купон пользователя
   private userOrderLists: Map<number, any[]> = new Map(); // Список заказов для каждого пользователя
   private userCurrentOrderIndex: Map<number, number> = new Map(); // Текущий индекс просматриваемого заказа
