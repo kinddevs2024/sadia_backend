@@ -125,14 +125,29 @@ try {
 } catch (error) {
   console.error('Swagger generation error:', error);
   // Return a minimal spec if generation fails
-  swaggerSpec = {
-    openapi: '3.0.0',
-    info: options.definition.info,
-    servers: options.definition.servers,
-    paths: {},
-    components: options.definition.components,
-    tags: options.definition.tags,
-  };
+  if (!options.definition) {
+    swaggerSpec = {
+      openapi: '3.0.0',
+      info: {
+        title: 'Sadia.lux API Documentation',
+        version: '1.0.0',
+        description: 'API documentation for Sadia.lux e-commerce backend system',
+      },
+      servers: [{ url: 'http://localhost:3000', description: 'Development server' }],
+      paths: {},
+      components: {},
+      tags: [],
+    };
+  } else {
+    swaggerSpec = {
+      openapi: '3.0.0',
+      info: options.definition.info,
+      servers: options.definition.servers,
+      paths: {},
+      components: options.definition.components || {},
+      tags: options.definition.tags || [],
+    };
+  }
 }
 
 export { swaggerSpec };
