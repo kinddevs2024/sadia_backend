@@ -5,6 +5,24 @@ import { Product, Category, Inventory } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/products/slug/{slug}:
+ *   get:
+ *     summary: Get product by slug
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product details
+ *       404:
+ *         description: Product not found
+ */
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }

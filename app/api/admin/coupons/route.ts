@@ -6,6 +6,30 @@ import { Coupon } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/admin/coupons:
+ *   get:
+ *     summary: Get all coupons (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all coupons
+ *       403:
+ *         description: Forbidden
+ *   post:
+ *     summary: Create coupon (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Coupon created
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

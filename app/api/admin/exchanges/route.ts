@@ -6,6 +6,20 @@ import { Exchange } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/admin/exchanges:
+ *   get:
+ *     summary: Get all exchanges (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all exchanges
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

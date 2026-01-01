@@ -6,6 +6,39 @@ import { Exchange, Order } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/exchanges:
+ *   post:
+ *     summary: Create exchange request
+ *     tags: [Exchanges]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - orderId
+ *               - reason
+ *             properties:
+ *               orderId:
+ *                 type: string
+ *               productId:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *                 enum: [EXCHANGE, CANCELLATION]
+ *     responses:
+ *       201:
+ *         description: Exchange request created
+ *       401:
+ *         description: Unauthorized
+ */
 export async function POST(req: NextRequest) {
   try {
     const user = requireAuth(req);

@@ -6,6 +6,20 @@ import { Order, OrderItem } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/admin/analytics:
+ *   get:
+ *     summary: Get analytics data (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Analytics data
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

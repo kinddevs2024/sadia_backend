@@ -7,6 +7,30 @@ import { decreaseInventoryOnPayment } from '@/lib/inventory-utils';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/pos/orders:
+ *   get:
+ *     summary: Get POS orders (Cashier/Admin only)
+ *     tags: [POS]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of POS orders
+ *       403:
+ *         description: Forbidden
+ *   post:
+ *     summary: Create POS order (Cashier/Admin only)
+ *     tags: [POS]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Order created
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);

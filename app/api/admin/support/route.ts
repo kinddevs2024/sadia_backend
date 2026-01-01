@@ -6,6 +6,30 @@ import { SupportMessage } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/admin/support:
+ *   get:
+ *     summary: Get all support messages (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of support messages
+ *       403:
+ *         description: Forbidden
+ *   put:
+ *     summary: Update support message status (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Support message updated
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

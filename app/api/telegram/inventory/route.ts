@@ -5,7 +5,21 @@ import { Inventory } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
-// Public endpoint for Telegram bot to get inventory
+/**
+ * @swagger
+ * /api/telegram/inventory:
+ *   get:
+ *     summary: Get inventory for Telegram bot
+ *     tags: [Telegram]
+ *     parameters:
+ *       - in: query
+ *         name: productId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Inventory data
+ */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

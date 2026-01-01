@@ -7,6 +7,78 @@ import { sendTelegramNotificationByPhone } from '@/lib/telegram-notify';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/orders:
+ *   get:
+ *     summary: Get all orders
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [PENDING, PAID, CANCELLED, COMPLETED]
+ *         description: Filter by order status
+ *       - in: query
+ *         name: source
+ *         schema:
+ *           type: string
+ *           enum: [ONLINE, POS, TELEGRAM]
+ *         description: Filter by order source
+ *     responses:
+ *       200:
+ *         description: List of orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       401:
+ *         description: Unauthorized
+ *   post:
+ *     summary: Create a new order
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - items
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     productId:
+ *                       type: string
+ *                     size:
+ *                       type: string
+ *                     quantity:
+ *                       type: integer
+ *               couponCode:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Order created successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
 export async function GET(req: NextRequest) {
   try {
     const user = requireAuth(req);

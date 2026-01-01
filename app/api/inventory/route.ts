@@ -6,6 +6,30 @@ import { Inventory, Product } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/inventory:
+ *   get:
+ *     summary: Get all inventory items (Admin only)
+ *     tags: [Inventory]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of inventory items
+ *       403:
+ *         description: Forbidden
+ *   post:
+ *     summary: Create inventory item (Admin only)
+ *     tags: [Inventory]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Inventory item created
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

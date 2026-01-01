@@ -6,6 +6,40 @@ import { Review } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/admin/reviews:
+ *   get:
+ *     summary: Get all reviews (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all reviews
+ *       403:
+ *         description: Forbidden
+ *   put:
+ *     summary: Update review status (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Review updated
+ *       403:
+ *         description: Forbidden
+ *   delete:
+ *     summary: Delete review (Admin only)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Review deleted
+ *       403:
+ *         description: Forbidden
+ */
 export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);

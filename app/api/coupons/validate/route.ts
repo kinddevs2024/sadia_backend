@@ -5,6 +5,31 @@ import { Coupon } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/coupons/validate:
+ *   post:
+ *     summary: Validate coupon code
+ *     tags: [Coupons]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - code
+ *             properties:
+ *               code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Coupon is valid
+ *       400:
+ *         description: Coupon invalid or expired
+ *       404:
+ *         description: Coupon not found
+ */
 export async function POST(req: NextRequest) {
   try {
     const { code } = await req.json();

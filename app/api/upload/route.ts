@@ -14,6 +14,30 @@ if (!existsSync(UPLOAD_DIR)) {
   mkdir(UPLOAD_DIR, { recursive: true }).catch(console.error);
 }
 
+/**
+ * @swagger
+ * /api/upload:
+ *   post:
+ *     summary: Upload file (Admin only)
+ *     tags: [Upload]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: File uploaded successfully
+ *       403:
+ *         description: Forbidden
+ */
 export async function POST(req: NextRequest) {
   try {
     requireAdmin(req);

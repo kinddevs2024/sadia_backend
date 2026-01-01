@@ -5,7 +5,22 @@ import { Order } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
-// Public endpoint for Telegram bot to get user orders
+/**
+ * @swagger
+ * /api/telegram/orders:
+ *   get:
+ *     summary: Get orders by Telegram user ID
+ *     tags: [Telegram]
+ *     parameters:
+ *       - in: query
+ *         name: telegramUserId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of orders
+ */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

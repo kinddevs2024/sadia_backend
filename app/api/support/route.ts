@@ -5,6 +5,33 @@ import { SupportMessage } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/support:
+ *   post:
+ *     summary: Create support message
+ *     tags: [Support]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - message
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               message:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Support message created
+ *       400:
+ *         description: Bad request
+ */
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();

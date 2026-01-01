@@ -5,7 +5,16 @@ import { Product } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
-// Public endpoint for Telegram bot to get products
+/**
+ * @swagger
+ * /api/telegram/products:
+ *   get:
+ *     summary: Get products for Telegram bot
+ *     tags: [Telegram]
+ *     responses:
+ *       200:
+ *         description: List of products
+ */
 export async function GET(req: NextRequest) {
   try {
     const products = getAll<Product>('products');

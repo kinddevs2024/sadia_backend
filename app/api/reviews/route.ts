@@ -5,6 +5,58 @@ import { Review } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * @swagger
+ * /api/reviews:
+ *   get:
+ *     summary: Get all reviews
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: query
+ *         name: productId
+ *         schema:
+ *           type: string
+ *         description: Filter by product ID
+ *       - in: query
+ *         name: approved
+ *         schema:
+ *           type: boolean
+ *         description: Filter by approval status
+ *     responses:
+ *       200:
+ *         description: List of reviews
+ *   post:
+ *     summary: Create a new review
+ *     tags: [Reviews]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - text
+ *               - rating
+ *             properties:
+ *               name:
+ *                 type: string
+ *               text:
+ *                 type: string
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               productId:
+ *                 type: string
+ *               orderId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Review created successfully
+ *       400:
+ *         description: Bad request
+ */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
