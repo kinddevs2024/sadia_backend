@@ -1,18 +1,9 @@
 import { NextRequest } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { uploadFileToBlob } from '@/lib/blob-storage';
 
 export const dynamic = 'force-dynamic';
-
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
-
-// Ensure upload directory exists
-if (!existsSync(UPLOAD_DIR)) {
-  mkdir(UPLOAD_DIR, { recursive: true }).catch(console.error);
-}
 
 /**
  * @swagger
@@ -61,25 +52,11 @@ export async function POST(req: NextRequest) {
       return errorResponse('File size exceeds 5MB limit', 400);
     }
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = path.extname(file.name);
-    const filename = `${timestamp}-${randomString}${extension}`;
-    const filepath = path.join(UPLOAD_DIR, filename);
-
-    // Ensure directory exists
-    if (!existsSync(UPLOAD_DIR)) {
-      await mkdir(UPLOAD_DIR, { recursive: true });
-    }
-
-    // Convert file to buffer and save
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filepath, buffer);
-
-    // Return URL path (accessible from frontend)
-    const url = `/uploads/${filename}`;
+    // Upload to Vercel Blob Storage
+    const url = await uploadFileToBlob(file, file.name);
+    
+    // Extract filename from URL for response
+    const filename = url.substring(url.lastIndexOf('/') + 1);
 
     return successResponse({ url, filename });
   } catch (error: any) {

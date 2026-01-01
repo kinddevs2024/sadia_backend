@@ -3,9 +3,7 @@ import { getById, update, getAll, create, remove } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Product, ProductImage } from '@/types';
-import { writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { uploadFileToBlob } from '@/lib/blob-storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,27 +85,8 @@ export async function POST(
           return errorResponse(`File size exceeds ${isVideo ? '50MB' : '5MB'} limit`, 400);
         }
 
-        // Generate unique filename
-        const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 15);
-        const extension = path.extname(file.name);
-        const filename = `${timestamp}-${randomString}${extension}`;
-        
-        const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
-        const filepath = path.join(UPLOAD_DIR, filename);
-
-        // Ensure directory exists
-        if (!existsSync(UPLOAD_DIR)) {
-          await mkdir(UPLOAD_DIR, { recursive: true });
-        }
-
-        // Convert file to buffer and save
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        await writeFile(filepath, buffer);
-
-        // Return relative URL path
-        imageUrl = `/uploads/${filename}`;
+        // Upload to Vercel Blob Storage
+        imageUrl = await uploadFileToBlob(file, file.name);
       } else {
         return errorResponse('Invalid content type', 400);
       }
