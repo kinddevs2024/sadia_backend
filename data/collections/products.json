@@ -22,10 +22,18 @@
         "order": 1,
         "productId": "1766824244958-abc123def",
         "createdAt": "2026-01-12T13:58:06.865Z"
+      },
+      {
+        "id": "1768227243961-iq3v29bvw",
+        "url": "/uploads/Crystal Clear Aero.jpg",
+        "type": "image",
+        "order": 2,
+        "productId": "1766824244958-abc123def",
+        "createdAt": "2026-01-12T14:14:03.961Z"
       }
     ],
     "createdAt": "2025-12-27T08:30:45.000Z",
-    "updatedAt": "2026-01-12T13:58:06.865Z"
+    "updatedAt": "2026-01-12T14:14:03.961Z"
   },
   {
     "id": "1766824244958-def456ghi",

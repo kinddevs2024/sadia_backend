@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getById, update, getAll, create, remove } from '@/lib/db';
+import { getByIdAsync, updateAsync } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Product, ProductImage } from '@/types';
@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const product = getById<Product>('products', params.id);
+    const product = await getByIdAsync<Product>('products', params.id);
 
     if (!product) {
       return errorResponse('Product not found', 404);
@@ -33,7 +33,7 @@ export async function POST(
   try {
     requireAdmin(req);
 
-    const product = getById<Product>('products', params.id);
+    const product = await getByIdAsync<Product>('products', params.id);
     if (!product) {
       return errorResponse('Product not found', 404);
     }
@@ -115,7 +115,7 @@ export async function POST(
     };
 
     const updatedImages = [...images, newImage];
-    const updatedProduct = update<Product>('products', params.id, {
+    await updateAsync<Product>('products', params.id, {
       images: updatedImages,
       updatedAt: new Date().toISOString(),
     });
