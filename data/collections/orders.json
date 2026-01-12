@@ -110,10 +110,21 @@
     "id": "1767265550882-0ub3ozkbr",
     "userId": "1767265539634-3m2zfurvf",
     "orderNumber": "ORD-1767265550882-PPHJODTBY",
-    "status": "PENDING",
+    "status": "CANCELLED",
     "source": "ONLINE",
     "total": 1616618,
     "paymentMethod": "PAYME",
-    "createdAt": "2026-01-01T11:05:50.882Z"
+    "createdAt": "2026-01-01T11:05:50.882Z",
+    "updatedAt": "2026-01-04T10:06:45.896Z"
+  },
+  {
+    "id": "1767521002546-7wcjgd8k5",
+    "orderNumber": "ORD-1767521002546-Q75BR1RHR",
+    "status": "PAID",
+    "source": "ONLINE",
+    "total": 250000,
+    "paymentMethod": "PAYME",
+    "createdAt": "2026-01-04T10:03:22.546Z",
+    "updatedAt": "2026-01-04T10:04:30.150Z"
   }
 ]

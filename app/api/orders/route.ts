@@ -26,7 +26,7 @@ export const dynamic = 'force-dynamic';
  *         name: source
  *         schema:
  *           type: string
- *           enum: [ONLINE, POS, TELEGRAM]
+ *           enum: [ONLINE, POS, OFFLINE, TELEGRAM]
  *         description: Filter by order source
  *     responses:
  *       200:
@@ -245,4 +245,3 @@ export async function POST(req: NextRequest) {
     return errorResponse(error.message || 'Internal server error', 500);
   }
 }
-

@@ -93,7 +93,18 @@ export async function PUT(
     requireAdmin(req);
 
     const data = await req.json();
-    const { name, description, price, costPrice, categoryId, slug } = data;
+    const {
+      name,
+      description,
+      price,
+      costPrice,
+      categoryId,
+      slug,
+      sku,
+      stock,
+      active_for_pos,
+      offline_price,
+    } = data;
 
     const existingProduct = await getByIdAsync<Product>('products', params.id);
     if (!existingProduct) {
@@ -101,12 +112,20 @@ export async function PUT(
     }
 
     const productSlug = slug || name?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '') || existingProduct.slug;
-    const profit = costPrice !== undefined ? (price || existingProduct.price) - costPrice : existingProduct.profit;
+    const nextPrice = price ?? existingProduct.price;
+    const nextCost = costPrice !== undefined ? costPrice : existingProduct.costPrice;
+    const profit = nextCost !== undefined ? nextPrice - nextCost : existingProduct.profit;
 
     const updatedProduct = await updateAsync<Product>('products', params.id, {
       ...data,
       slug: productSlug,
+      price: nextPrice,
+      costPrice: nextCost,
       profit,
+      sku: sku ?? existingProduct.sku,
+      stock: stock ?? existingProduct.stock ?? 0,
+      active_for_pos: active_for_pos ?? existingProduct.active_for_pos ?? false,
+      offline_price: offline_price ?? existingProduct.offline_price ?? null,
       updatedAt: new Date().toISOString(),
     });
 

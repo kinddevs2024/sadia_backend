@@ -94,5 +94,13 @@
     "size": "S, M ",
     "quantity": 2,
     "price": 808309
+  },
+  {
+    "id": "1767521002549-7r90j2qy2",
+    "orderId": "1767521002546-7wcjgd8k5",
+    "productId": "1766824244958-abc123def",
+    "size": "S",
+    "quantity": 1,
+    "price": 250000
   }
 ]

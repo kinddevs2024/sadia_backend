@@ -150,7 +150,18 @@ export async function POST(req: NextRequest) {
     requireAdmin(req);
 
     const data = await req.json();
-    const { name, description, price, costPrice, categoryId, slug } = data;
+    const {
+      name,
+      description,
+      price,
+      costPrice,
+      categoryId,
+      slug,
+      sku,
+      stock,
+      active_for_pos,
+      offline_price,
+    } = data;
 
     if (!name || !price || !categoryId) {
       return errorResponse('Name, price, and categoryId are required', 400);
@@ -168,6 +179,10 @@ export async function POST(req: NextRequest) {
       costPrice,
       profit,
       categoryId,
+      sku,
+      stock: stock ?? 0,
+      active_for_pos: active_for_pos ?? false,
+      offline_price: offline_price ?? null,
       createdAt: new Date().toISOString(),
     });
 

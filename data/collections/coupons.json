@@ -9,5 +9,16 @@
     "createdAt": "2025-12-28T08:21:10.406Z",
     "id": "1766910070410-kfabtsyzv",
     "usedBy": "1766824244842-q84dk4oer"
+  },
+  {
+    "id": "1767517957110-9rs7eoomi",
+    "code": "AAA",
+    "discount": 20,
+    "discountType": "PERCENTAGE",
+    "validFrom": "2026-01-04T09:12:37.110Z",
+    "validUntil": "2026-01-04T09:12:37.110Z",
+    "oneTimeUse": false,
+    "used": false,
+    "createdAt": "2026-01-04T09:12:37.110Z"
   }
 ]

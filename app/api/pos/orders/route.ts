@@ -2,8 +2,10 @@ import { NextRequest } from 'next/server';
 import { create, getAll } from '@/lib/db';
 import { requireRole } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { Order, OrderItem, Product } from '@/types';
-import { decreaseInventoryOnPayment } from '@/lib/inventory-utils';
+import { Order, OrderItem, Product, PaymentStatus, PaymentMethod } from '@/types';
+import { atomicDecreaseStock } from '@/lib/inventory-utils';
+import { generateReceiptNumber } from '@/lib/receipt-utils';
+import { getTerminalProvider } from '@/lib/terminal/factory';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +17,36 @@ export const dynamic = 'force-dynamic';
  *     tags: [POS]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [PAID, PENDING, FAILED, COMPLETED]
+ *       - in: query
+ *         name: cashierId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: dateFrom
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: dateTo
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           default: 50
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: number
+ *           default: 0
  *     responses:
  *       200:
  *         description: List of POS orders
@@ -25,9 +57,39 @@ export const dynamic = 'force-dynamic';
  *     tags: [POS]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - items
+ *               - paymentMethod
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     productId:
+ *                       type: string
+ *                     quantity:
+ *                       type: number
+ *                     size:
+ *                       type: string
+ *               paymentMethod:
+ *                 type: string
+ *                 enum: [CASH, TERMINAL]
+ *               cashierId:
+ *                 type: string
+ *               notes:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Order created
+ *       400:
+ *         description: Bad request (validation error or stock insufficient)
  *       403:
  *         description: Forbidden
  */
@@ -35,11 +97,50 @@ export async function GET(req: NextRequest) {
   try {
     requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);
 
-    const orders = getAll<Order>('orders')
-      .filter(o => o.source === 'POS')
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Parse query parameters
+    const searchParams = req.nextUrl.searchParams;
+    const status = searchParams.get('status');
+    const cashierId = searchParams.get('cashierId');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
 
-    return successResponse(orders);
+    let orders = getAll<Order>('orders').filter(
+      o => o.source === 'POS' || o.source === 'OFFLINE' || o.channel === 'offline'
+    );
+
+    // Filter by status
+    if (status) {
+      orders = orders.filter(o => o.status === status);
+    }
+
+    // Filter by cashier
+    if (cashierId) {
+      orders = orders.filter(o => o.cashier_id === cashierId);
+    }
+
+    // Filter by date range
+    if (dateFrom || dateTo) {
+      orders = orders.filter(o => {
+        const orderDate = new Date(o.createdAt);
+        if (dateFrom && new Date(dateFrom) > orderDate) return false;
+        if (dateTo && new Date(dateTo) < orderDate) return false;
+        return true;
+      });
+    }
+
+    // Sort newest first
+    orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Paginate
+    const total = orders.length;
+    const paginatedOrders = orders.slice(offset, offset + limit);
+
+    return successResponse({
+      data: paginatedOrders,
+      meta: { total, limit, offset }
+    });
   } catch (error: any) {
     if (error.message === 'Unauthorized' || error.message === 'Forbidden') {
       return errorResponse(error.message, 403);
@@ -51,64 +152,165 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);
+    const user = requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);
 
     const data = await req.json();
-    const { items, paymentMethod } = data;
+    const { items, paymentMethod, cashierId, notes } = data;
 
+    // Validation
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return errorResponse('Items are required', 400);
+      return errorResponse('Items array is required and must not be empty', 400);
     }
 
-    if (!paymentMethod) {
-      return errorResponse('Payment method is required', 400);
+    const allowedMethods: PaymentMethod[] = ['CASH', 'TERMINAL', 'TRANSFER'];
+    if (!paymentMethod || !allowedMethods.includes(paymentMethod)) {
+      return errorResponse('Payment method must be CASH, TERMINAL or TRANSFER', 400);
     }
 
-    // Calculate total
-    let total = 0;
+    for (const item of items) {
+      if (!item.productId || !item.quantity || item.quantity <= 0) {
+        return errorResponse('Each item must have productId and positive quantity', 400);
+      }
+    }
+
+    // Get products and calculate total
     const products = getAll<Product>('products');
+    let total = 0;
+    const validatedItems: { productId: string; quantity: number; size?: string; product: Product }[] = [];
 
     for (const item of items) {
       const product = products.find(p => p.id === item.productId);
       if (!product) {
-        return errorResponse(`Product ${item.productId} not found`, 400);
+        return errorResponse(`Product ${item.productId} not found`, 404);
       }
-      total += product.price * item.quantity;
+
+      // Check if product is active for POS
+      if (product.active_for_pos === false) {
+        return errorResponse(`Product ${product.name} is not available for POS`, 400);
+      }
+
+      // Check stock
+      const stock = product.stock ?? 0;
+      if (stock < item.quantity) {
+        return errorResponse(
+          `Product "${product.name}" only has ${stock} in stock (requested ${item.quantity})`,
+          400
+        );
+      }
+
+      const effectivePrice = (product.offline_price ?? product.price) || 0;
+      total += effectivePrice * item.quantity;
+      validatedItems.push({
+        productId: item.productId,
+        quantity: item.quantity,
+        size: item.size,
+        product
+      });
     }
 
-    // Generate order number
-    const orderNumber = `POS-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    if (total <= 0) {
+      return errorResponse('Order total must be greater than 0', 400);
+    }
+
+    // Determine payment status based on method
+    let initialPaymentStatus: PaymentStatus;
+    let initialOrderStatus: string;
+    let terminalTransactionId: string | undefined;
+
+    if (paymentMethod === 'CASH' || paymentMethod === 'TRANSFER') {
+      initialPaymentStatus = 'paid';
+      initialOrderStatus = 'PAID';
+    } else {
+      // TERMINAL: needs confirmation
+      initialPaymentStatus = 'pending';
+      initialOrderStatus = 'PENDING';
+
+      // Initiate terminal transaction
+      const terminalProvider = getTerminalProvider();
+      try {
+        const terminalResult = await terminalProvider.initiate(total, {
+          items: validatedItems.map(vi => ({ name: vi.product.name, qty: vi.quantity })),
+          cashierId: cashierId || user.id,
+          timestamp: new Date().toISOString()
+        });
+        terminalTransactionId = terminalResult.transactionId;
+      } catch (error: any) {
+        return errorResponse(`Terminal initiation failed: ${error.message}`, 500);
+      }
+    }
 
     // Create order
+    const createdAt = new Date().toISOString();
+    const receiptNumber = generateReceiptNumber(createdAt);
+    const orderId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const order = create<Order>('orders', {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      orderNumber,
-      status: 'PAID',
-      source: 'POS',
+      id: orderId,
+      orderNumber: receiptNumber,
+      receipt_number: receiptNumber,
+      status: initialOrderStatus,
+      channel: 'offline',
+      source: 'OFFLINE',
       total,
       paymentMethod,
-      createdAt: new Date().toISOString(),
-    });
+      payment_method: paymentMethod,
+      payment_status: initialPaymentStatus,
+      terminal_transaction_id: terminalTransactionId,
+      cashier_id: cashierId || user.id,
+      createdAt,
+    } as Order);
 
     // Create order items
-    const orderItems: OrderItem[] = [];
-    for (const item of items) {
-      const product = products.find(p => p.id === item.productId)!;
+    const createdItems: OrderItem[] = [];
+    for (const validatedItem of validatedItems) {
       const orderItem = create<OrderItem>('orderItems', {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         orderId: order.id,
-        productId: item.productId,
-        size: item.size,
-        quantity: item.quantity,
-        price: product.price,
+        productId: validatedItem.productId,
+        size: validatedItem.size,
+        quantity: validatedItem.quantity,
+        price: (validatedItem.product.offline_price ?? validatedItem.product.price) || 0,
+        product_name: validatedItem.product.name,
+        sku: validatedItem.product.sku
       });
-      orderItems.push(orderItem);
+      createdItems.push(orderItem);
     }
 
-    // Decrease inventory since order is immediately PAID
-    decreaseInventoryOnPayment(orderItems);
+    // Decrease stock immediately if оплата подтверждена сразу
+    // Для TERMINAL уменьшаем при подтверждении
+    if (paymentMethod === 'CASH' || paymentMethod === 'TRANSFER') {
+      for (const validatedItem of validatedItems) {
+        const result = atomicDecreaseStock(
+          validatedItem.productId,
+          validatedItem.quantity,
+          'purchase',
+          cashierId || user.id,
+          orderId
+        );
 
-    return successResponse({ order, items: orderItems }, 201);
+        if (!result.success) {
+          // Rollback: This should not happen as we validated stock above, but be safe
+          return errorResponse(
+            `Failed to decrease stock for ${validatedItem.product.name}: ${result.error}`,
+            500
+          );
+        }
+      }
+    }
+
+    // Log successful order creation
+    console.log(`[POS] Created order ${receiptNumber} with payment method ${paymentMethod}`);
+
+    return successResponse(
+      {
+        order,
+        items: createdItems,
+        message: paymentMethod === 'CASH' 
+          ? 'Order paid and confirmed' 
+          : 'Order awaiting terminal payment confirmation'
+      },
+      201
+    );
   } catch (error: any) {
     if (error.message === 'Unauthorized' || error.message === 'Forbidden') {
       return errorResponse(error.message, 403);

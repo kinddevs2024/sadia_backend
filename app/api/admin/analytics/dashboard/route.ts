@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getAll, count } from '@/lib/db';
+import { getAllAsync, countAsync } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order } from '@/types';
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   try {
     requireAdmin(req);
 
-    const orders = getAll<Order>('orders');
+    const orders = await getAllAsync<Order>('orders');
     
     // Получаем начало сегодняшнего дня (00:00:00)
     const today = new Date();
@@ -60,17 +60,17 @@ export async function GET(req: NextRequest) {
         orders: allTimeOrdersCount,
       },
       // Дополнительная статистика для обратной совместимости
-      totalProducts: count('products'),
-      totalCategories: count('categories'),
+      totalProducts: await countAsync('products'),
+      totalCategories: await countAsync('categories'),
       totalOrders: allTimeOrdersCount,
-      totalUsers: count('users'),
+      totalUsers: await countAsync('users'),
       totalRevenue: allTimeRevenue,
-      pendingOrders: count('orders', (o: Order) => o.status === 'PENDING'),
-      completedOrders: count('orders', (o: Order) => o.status === 'COMPLETED'),
+      pendingOrders: orders.filter((o: Order) => o.status === 'PENDING').length,
+      completedOrders: orders.filter((o: Order) => o.status === 'COMPLETED').length,
       bySource: {
-        ONLINE: count('orders', (o: Order) => o.source === 'ONLINE'),
-        POS: count('orders', (o: Order) => o.source === 'POS'),
-        TELEGRAM: count('orders', (o: Order) => o.source === 'TELEGRAM'),
+        ONLINE: orders.filter((o: Order) => o.source === 'ONLINE').length,
+        POS: orders.filter((o: Order) => o.source === 'POS').length,
+        TELEGRAM: orders.filter((o: Order) => o.source === 'TELEGRAM').length,
       },
     };
 

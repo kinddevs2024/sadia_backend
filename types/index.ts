@@ -1,7 +1,11 @@
 export type UserRole = 'SUPERADMIN' | 'ADMIN' | 'CASHIER' | 'USER';
 export type OrderStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'COMPLETED';
-export type OrderSource = 'ONLINE' | 'POS' | 'TELEGRAM';
+export type OrderSource = 'ONLINE' | 'POS' | 'OFFLINE' | 'TELEGRAM';
 export type PaymentProvider = 'PAYME' | 'CLICK' | 'TERMINAL' | 'CASH';
+export type PaymentMethod = 'CASH' | 'TERMINAL' | 'TRANSFER';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+export type OrderChannel = 'online' | 'offline';
+export type StockMovementReason = 'purchase' | 'manual_adjustment' | 'return' | 'damage';
 export type DiscountType = 'PERCENTAGE' | 'FIXED';
 export type ExchangeStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
 
@@ -62,6 +66,10 @@ export interface Product {
   profit?: number;
   categoryId: string;
   images?: ProductImage[];
+  stock?: number;           // NEW: main stock quantity
+  active_for_pos?: boolean; // NEW: visibility in POS (default: true)
+  offline_price?: number | null; // NEW: optional offline-specific price
+  sku?: string;             // NEW: barcode/SKU for scanning
   createdAt: string;
   updatedAt?: string;
 }
@@ -72,8 +80,14 @@ export interface Order {
   orderNumber: string;
   status: OrderStatus;
   source: OrderSource;
+  channel?: OrderChannel;           // NEW: 'online' | 'offline' (alias for source)
   total: number;
-  paymentMethod?: string;
+  paymentMethod?: PaymentMethod;
+  payment_method?: PaymentMethod;   // Alternate naming for POS receipt compatibility
+  payment_status?: PaymentStatus;   // NEW: separate from order status
+  terminal_transaction_id?: string; // NEW: reference to terminal provider
+  cashier_id?: string;              // NEW: POS cashier (User.id)
+  receipt_number?: string;          // NEW: POS receipt (RCP-YYYYMMDD-SEQ)
   telegramUserId?: string;
   couponCode?: string;
   discount?: number;
@@ -88,6 +102,8 @@ export interface OrderItem {
   size?: string;
   quantity: number;
   price: number;
+  product_name?: string;    // NEW: snapshot of product.name
+  sku?: string;             // NEW: snapshot of product.sku
 }
 
 export interface Review {
@@ -159,5 +175,16 @@ export interface SupportMessage {
 export interface NewsletterSubscription {
   id: string;
   email: string;
+  createdAt: string;
+}
+
+export interface StockMovement {
+  id: string;
+  productId: string;
+  delta: number;              // Positive or negative change
+  reason: StockMovementReason;
+  orderId?: string;           // If linked to order
+  userId: string;             // Who made the change (cashier or admin)
+  notes?: string;
   createdAt: string;
 }

@@ -71,5 +71,115 @@
     "phone": "909496694",
     "address": "qizilguncha 2 tor 10 uy",
     "createdAt": "2026-01-01T11:15:33.375Z"
+  },
+  {
+    "id": "1767456072591-zyko6akur",
+    "email": "john.doe@example.com",
+    "password": "$2b$10$6bnNB5QFKU7Fsfz9c1LOk.Op3FILq.Ou7lPlCCSgHeE57cdr9Ex26",
+    "role": "USER",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "address": "123 Main St, City, Country",
+    "createdAt": "2026-01-03T16:01:12.591Z"
+  },
+  {
+    "id": "1767456072703-c1yrmsi9f",
+    "email": "jane.smith@example.com",
+    "password": "$2b$10$K731NyScMeALKiigAHP7HulxJysmSYr7yZ0mCEpJDh5ptO8OHi1Da",
+    "role": "USER",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "phone": "+1234567891",
+    "address": "456 Oak Ave, City, Country",
+    "createdAt": "2026-01-03T16:01:12.703Z"
+  },
+  {
+    "id": "1767456072790-yrv35ny48",
+    "email": "mike.johnson@example.com",
+    "password": "$2b$10$KGLJR.0BFZhuFrRhyXID.O3JZ45.C8C8mTtlpB7JvPwlsEHX9wXXy",
+    "role": "USER",
+    "firstName": "Mike",
+    "lastName": "Johnson",
+    "phone": "+1234567892",
+    "address": "789 Pine Rd, City, Country",
+    "createdAt": "2026-01-03T16:01:12.790Z"
+  },
+  {
+    "id": "1767456072871-977x4qg35",
+    "email": "sarah.wilson@example.com",
+    "password": "$2b$10$eVhhI5iQCkXB8BH1/oWgluHArYefrpv8MWCdMzjtdGRTbOZ9V4K6G",
+    "role": "USER",
+    "firstName": "Sarah",
+    "lastName": "Wilson",
+    "phone": "+1234567893",
+    "address": "321 Elm St, City, Country",
+    "createdAt": "2026-01-03T16:01:12.871Z"
+  },
+  {
+    "id": "1767456072935-hspwpqjt9",
+    "email": "david.brown@example.com",
+    "password": "$2b$10$SlWPrCRcgO/xEOxMITkhK.qPb969yWzqGaSEF.LcCqMAer15Z0CYW",
+    "role": "USER",
+    "firstName": "David",
+    "lastName": "Brown",
+    "phone": "+1234567894",
+    "address": "654 Maple Dr, City, Country",
+    "createdAt": "2026-01-03T16:01:12.935Z"
+  },
+  {
+    "id": "1767456073007-y5v3vy6qj",
+    "email": "lisa.davis@example.com",
+    "password": "$2b$10$6mnlLngwW0rj6pDAOSMujONRPFPB/z0qJ0YhPA5B6dfTbZ04E3Nf.",
+    "role": "USER",
+    "firstName": "Lisa",
+    "lastName": "Davis",
+    "phone": "+1234567895",
+    "address": "987 Cedar Ln, City, Country",
+    "createdAt": "2026-01-03T16:01:13.007Z"
+  },
+  {
+    "id": "1767456073089-sv3ucc5w1",
+    "email": "alex.garcia@example.com",
+    "password": "$2b$10$TeGyvIWblOLqyDZoAVZLUeg8tSwZCcBqKmBFPg/FYxVfN51ttdpM2",
+    "role": "USER",
+    "firstName": "Alex",
+    "lastName": "Garcia",
+    "phone": "+1234567896",
+    "address": "147 Birch Ave, City, Country",
+    "createdAt": "2026-01-03T16:01:13.089Z"
+  },
+  {
+    "id": "1767456073177-pu6ye9dxc",
+    "email": "emma.martinez@example.com",
+    "password": "$2b$10$Gd6.Uk2FZDJmieUB22Ldf.2g9znW/RQBT2th8ysLurV83h/66FKim",
+    "role": "USER",
+    "firstName": "Emma",
+    "lastName": "Martinez",
+    "phone": "+1234567897",
+    "address": "258 Spruce St, City, Country",
+    "createdAt": "2026-01-03T16:01:13.178Z"
+  },
+  {
+    "id": "1767456073274-56l3etdwl",
+    "email": "ryan.anderson@example.com",
+    "password": "$2b$10$NrJL29X1g1RfxAPhtfsFP.iQ2sQDM0zhPVRDVQfveGdlQnj0N0Xva",
+    "role": "USER",
+    "firstName": "Ryan",
+    "lastName": "Anderson",
+    "phone": "+1234567898",
+    "address": "369 Willow Rd, City, Country",
+    "createdAt": "2026-01-03T16:01:13.274Z"
+  },
+  {
+    "id": "1767456073400-qtdvyu14l",
+    "email": "olivia.taylor@example.com",
+    "password": "$2b$10$bZfn75bbq5rz5gwWrbqWaOd91Srwf45BL6ubO8ixf.f5A1AXqKs.u",
+    "role": "USER",
+    "firstName": "Olivia",
+    "lastName": "Taylor",
+    "phone": "+1234567899",
+    "address": "741 Poplar Dr, City, Country",
+    "createdAt": "2026-01-03T16:01:13.400Z"
   }
 ]
