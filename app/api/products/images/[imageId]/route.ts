@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getAll, getById, update } from '@/lib/db';
+import { getAllAsync, updateAsync } from '@/lib/db-fs';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Product, ProductImage } from '@/types';
@@ -14,7 +14,7 @@ export async function DELETE(
     requireAdmin(req);
 
     // Find product that contains this image
-    const products = getAll<Product>('products');
+    const products = await getAllAsync<Product>('products');
     const product = products.find(p => 
       p.images?.some(img => img.id === params.imageId)
     );
@@ -28,7 +28,7 @@ export async function DELETE(
       img => img.id !== params.imageId
     );
 
-    update<Product>('products', product.id, {
+    await updateAsync<Product>('products', product.id, {
       images: updatedImages,
       updatedAt: new Date().toISOString(),
     });
