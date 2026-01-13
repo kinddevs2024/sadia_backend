@@ -181,5 +181,16 @@
     "phone": "+1234567899",
     "address": "741 Poplar Dr, City, Country",
     "createdAt": "2026-01-03T16:01:13.400Z"
+  },
+  {
+    "id": "1768311229538-ahhrm4lvp",
+    "email": "charityhends22@gmail.com",
+    "password": "$2b$10$wcWxEcE55Dd1Zy2iWIiYY.H4J77zqA6yNninlQ91REFtpUSi/MYKq",
+    "role": "CASHIER",
+    "firstName": "umarbek",
+    "lastName": "ulugbekov",
+    "phone": "909496694",
+    "address": "qizilguncha 2 tor 10 uy",
+    "createdAt": "2026-01-13T13:33:49.538Z"
   }
 ]
