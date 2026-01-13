@@ -12,5 +12,12 @@
     "size": "11",
     "quantity": 1,
     "updatedAt": "2026-01-12T13:34:48.037Z"
+  },
+  {
+    "id": "1768309132925-flww9rk39",
+    "productId": "1766824244958-abc123def",
+    "size": "22",
+    "quantity": 4,
+    "updatedAt": "2026-01-13T12:58:52.925Z"
   }
 ]

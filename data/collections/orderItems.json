@@ -102,5 +102,13 @@
     "size": "S",
     "quantity": 1,
     "price": 250000
+  },
+  {
+    "id": "1768309181666-wx9833in1",
+    "orderId": "1768309181664-swjtjqmo5",
+    "productId": "1766824244958-abc123def",
+    "size": "22",
+    "quantity": 3,
+    "price": 250000
   }
 ]

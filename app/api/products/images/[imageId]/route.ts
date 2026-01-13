@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getAllAsync, updateAsync } from '@/lib/db-fs';
+import { getAllAsync, updateAsync } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Product, ProductImage } from '@/types';

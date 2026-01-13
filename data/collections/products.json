@@ -1,20 +1,17 @@
 [
   {
     "id": "1766824244958-abc123def",
-    "name": "Элегантное платье с длинными рукавами",
+    "name": "авами",
     "slug": "elegantnoe-platie-s-dlinnymi-rukavami",
     "description": "Красивое платье для мусульманок с длинными рукавами и скромным декольте",
     "price": 250000,
-    "costPrice": 150000,
-    "profit": 100000,
+    "costPrice": 160000,
+    "profit": 90000,
     "categoryId": "1766824244956-7yut9bzfn",
     "stock": 25,
     "active_for_pos": true,
     "sku": "PLT-001",
     "images": [
-      "https://picsum.photos/400/600?random=1",
-      "https://picsum.photos/400/600?random=2",
-      "https://picsum.photos/400/600?random=3",
       {
         "id": "1768226286865-pl61moj1l",
         "url": "/uploads/IMG_1743.PNG",
@@ -30,10 +27,19 @@
         "order": 2,
         "productId": "1766824244958-abc123def",
         "createdAt": "2026-01-12T14:14:03.961Z"
+      },
+      {
+        "id": "1768309068070-fs7vdgccf",
+        "url": "/uploads/Untitled video - Made with Clipchamp.mp4",
+        "type": "video",
+        "order": 3,
+        "productId": "1766824244958-abc123def",
+        "createdAt": "2026-01-13T12:57:48.070Z"
       }
     ],
     "createdAt": "2025-12-27T08:30:45.000Z",
-    "updatedAt": "2026-01-12T14:14:03.961Z"
+    "updatedAt": "2026-01-13T12:58:23.674Z",
+    "offline_price": null
   },
   {
     "id": "1766824244958-def456ghi",
@@ -48,10 +54,17 @@
     "active_for_pos": true,
     "sku": "PLT-002",
     "images": [
-      "https://picsum.photos/400/600?random=4",
-      "https://picsum.photos/400/600?random=5"
+      {
+        "id": "1768231478157-jx8w6tfq1",
+        "url": "/uploads/IMG_1743.PNG",
+        "type": "image",
+        "order": 1,
+        "productId": "1766824244958-def456ghi",
+        "createdAt": "2026-01-12T15:24:38.157Z"
+      }
     ],
-    "createdAt": "2025-12-27T08:30:46.000Z"
+    "createdAt": "2025-12-27T08:30:46.000Z",
+    "updatedAt": "2026-01-12T15:24:38.157Z"
   },
   {
     "id": "1766824244958-ghi789jkl",
@@ -65,11 +78,7 @@
     "stock": 30,
     "active_for_pos": true,
     "sku": "PLT-003",
-    "images": [
-      "https://picsum.photos/400/600?random=6",
-      "https://picsum.photos/400/600?random=7",
-      "https://picsum.photos/400/600?random=8"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:47.000Z"
   },
   {
@@ -84,10 +93,7 @@
     "stock": 40,
     "active_for_pos": true,
     "sku": "BLZ-001",
-    "images": [
-      "https://picsum.photos/400/600?random=9",
-      "https://picsum.photos/400/600?random=10"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:48.000Z"
   },
   {
@@ -102,11 +108,7 @@
     "stock": 20,
     "active_for_pos": true,
     "sku": "BLZ-002",
-    "images": [
-      "https://picsum.photos/400/600?random=11",
-      "https://picsum.photos/400/600?random=12",
-      "https://picsum.photos/400/600?random=13"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:49.000Z"
   },
   {
@@ -121,10 +123,7 @@
     "stock": 12,
     "active_for_pos": true,
     "sku": "BLZ-003",
-    "images": [
-      "https://picsum.photos/400/600?random=14",
-      "https://picsum.photos/400/600?random=15"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:50.000Z"
   },
   {
@@ -139,10 +138,7 @@
     "stock": 50,
     "active_for_pos": true,
     "sku": "ACC-001",
-    "images": [
-      "https://picsum.photos/400/600?random=16",
-      "https://picsum.photos/400/600?random=17"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:51.000Z"
   },
   {
@@ -157,11 +153,7 @@
     "stock": 8,
     "active_for_pos": true,
     "sku": "ACC-002",
-    "images": [
-      "https://picsum.photos/400/600?random=18",
-      "https://picsum.photos/400/600?random=19",
-      "https://picsum.photos/400/600?random=20"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:52.000Z"
   },
   {
@@ -176,10 +168,7 @@
     "stock": 35,
     "active_for_pos": true,
     "sku": "ACC-003",
-    "images": [
-      "https://picsum.photos/400/600?random=21",
-      "https://picsum.photos/400/600?random=22"
-    ],
+    "images": [],
     "createdAt": "2025-12-27T08:30:53.000Z"
   },
   {
