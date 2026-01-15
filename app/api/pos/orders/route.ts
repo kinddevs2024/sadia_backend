@@ -1,11 +1,12 @@
 import { NextRequest } from 'next/server';
-import { create, getAll } from '@/lib/db';
+import { create, getAll, getAllAsync } from '@/lib/db';
 import { requireRole } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { Order, OrderItem, Product, PaymentStatus, PaymentMethod } from '@/types';
-import { atomicDecreaseStock } from '@/lib/inventory-utils';
+import { Order, OrderItem, Product, Inventory, PaymentStatus, PaymentMethod } from '@/types';
+import { atomicDecreaseStock, decreaseInventoryOnPayment } from '@/lib/inventory-utils';
 import { generateReceiptNumber } from '@/lib/receipt-utils';
 import { getTerminalProvider } from '@/lib/terminal/factory';
+import { notifyAdminsAboutSale } from '@/lib/telegram-notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,7 +96,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(req: NextRequest) {
   try {
-    requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);
+    const user = requireRole(req, ['SUPERADMIN', 'ADMIN', 'CASHIER']);
 
     // Parse query parameters
     const searchParams = req.nextUrl.searchParams;
@@ -106,7 +107,11 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    let orders = getAll<Order>('orders').filter(
+    // Use getAllAsync to support Blob storage
+    let orders = await getAllAsync<Order>('orders');
+
+    // Filter POS/OFFLINE orders
+    orders = orders.filter(
       o => o.source === 'POS' || o.source === 'OFFLINE' || o.channel === 'offline'
     );
 
@@ -116,16 +121,37 @@ export async function GET(req: NextRequest) {
     }
 
     // Filter by cashier
-    if (cashierId) {
-      orders = orders.filter(o => o.cashier_id === cashierId);
+    // If user is CASHIER, they can only see their own orders (unless cashierId is explicitly provided)
+    // If user is ADMIN/SUPERADMIN, they can see all orders or filter by cashierId
+    let effectiveCashierId = cashierId;
+    if (user.role === 'CASHIER' && !cashierId) {
+      // Cashiers can only see their own orders
+      effectiveCashierId = user.id;
     }
 
-    // Filter by date range
+    if (effectiveCashierId) {
+      orders = orders.filter(o =>
+        o.cashier_id === effectiveCashierId || (o as any).cashierId === effectiveCashierId
+      );
+    }
+
+    // Filter by date range (dateTo should include the entire day)
     if (dateFrom || dateTo) {
       orders = orders.filter(o => {
         const orderDate = new Date(o.createdAt);
-        if (dateFrom && new Date(dateFrom) > orderDate) return false;
-        if (dateTo && new Date(dateTo) < orderDate) return false;
+
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          fromDate.setHours(0, 0, 0, 0);
+          if (orderDate < fromDate) return false;
+        }
+
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          toDate.setHours(23, 59, 59, 999); // Include entire day
+          if (orderDate > toDate) return false;
+        }
+
         return true;
       });
     }
@@ -136,6 +162,16 @@ export async function GET(req: NextRequest) {
     // Paginate
     const total = orders.length;
     const paginatedOrders = orders.slice(offset, offset + limit);
+
+    // Log for debugging
+    console.log(`[POS ORDERS] Found ${total} orders (showing ${paginatedOrders.length}), filters:`, {
+      cashierId: effectiveCashierId || 'all',
+      dateFrom,
+      dateTo,
+      status,
+      userRole: user.role,
+      userId: user.id
+    });
 
     return successResponse({
       data: paginatedOrders,
@@ -175,6 +211,10 @@ export async function POST(req: NextRequest) {
 
     // Get products and calculate total
     const products = getAll<Product>('products');
+
+    // Get inventory for size-based stock checks
+    const inventory = await getAllAsync<Inventory>('inventory');
+
     let total = 0;
     const validatedItems: { productId: string; quantity: number; size?: string; product: Product }[] = [];
 
@@ -189,13 +229,29 @@ export async function POST(req: NextRequest) {
         return errorResponse(`Product ${product.name} is not available for POS`, 400);
       }
 
-      // Check stock
-      const stock = product.stock ?? 0;
-      if (stock < item.quantity) {
-        return errorResponse(
-          `Product "${product.name}" only has ${stock} in stock (requested ${item.quantity})`,
-          400
+      // Check stock - if size is provided, check inventory, otherwise check product stock
+      if (item.size) {
+        const inventoryItem = inventory.find(
+          inv => inv.productId === item.productId && inv.size === item.size
         );
+
+        if (!inventoryItem || inventoryItem.quantity < item.quantity) {
+          const availableQty = inventoryItem?.quantity || 0;
+          return errorResponse(
+            `Product "${product.name}" size ${item.size} only has ${availableQty} in stock (requested ${item.quantity})`,
+            400
+          );
+        }
+      } else {
+        // Fallback: calculate stock from inventory if no size specified
+        const productInventory = inventory.filter(inv => inv.productId === item.productId);
+        const totalStock = productInventory.reduce((sum, inv) => sum + (inv.quantity || 0), 0);
+        if (totalStock < item.quantity) {
+          return errorResponse(
+            `Product "${product.name}" only has ${totalStock} in stock (requested ${item.quantity})`,
+            400
+          );
+        }
       }
 
       const effectivePrice = (product.offline_price ?? product.price) || 0;
@@ -279,21 +335,45 @@ export async function POST(req: NextRequest) {
     // Decrease stock immediately if оплата подтверждена сразу
     // Для TERMINAL уменьшаем при подтверждении
     if (paymentMethod === 'CASH' || paymentMethod === 'TRANSFER') {
-      for (const validatedItem of validatedItems) {
-        const result = atomicDecreaseStock(
-          validatedItem.productId,
-          validatedItem.quantity,
-          'purchase',
-          cashierId || user.id,
-          orderId
-        );
+      // If items have sizes, decrease inventory by size
+      const hasSizes = validatedItems.some(item => item.size);
 
-        if (!result.success) {
-          // Rollback: This should not happen as we validated stock above, but be safe
-          return errorResponse(
-            `Failed to decrease stock for ${validatedItem.product.name}: ${result.error}`,
-            500
+      if (hasSizes) {
+        // Use inventory-based decrease for items with sizes
+        decreaseInventoryOnPayment(createdItems);
+
+        // Also decrease product stock for compatibility
+        for (const validatedItem of validatedItems) {
+          const result = atomicDecreaseStock(
+            validatedItem.productId,
+            validatedItem.quantity,
+            'purchase',
+            cashierId || user.id,
+            orderId
           );
+
+          if (!result.success) {
+            console.warn(`Failed to decrease product stock for ${validatedItem.product.name}: ${result.error}`);
+            // Don't fail the order if inventory was decreased successfully
+          }
+        }
+      } else {
+        // Fallback to product stock if no sizes
+        for (const validatedItem of validatedItems) {
+          const result = atomicDecreaseStock(
+            validatedItem.productId,
+            validatedItem.quantity,
+            'purchase',
+            cashierId || user.id,
+            orderId
+          );
+
+          if (!result.success) {
+            return errorResponse(
+              `Failed to decrease stock for ${validatedItem.product.name}: ${result.error}`,
+              500
+            );
+          }
         }
       }
     }
@@ -301,12 +381,17 @@ export async function POST(req: NextRequest) {
     // Log successful order creation
     console.log(`[POS] Created order ${receiptNumber} with payment method ${paymentMethod}`);
 
+    // Notify admins about new sale
+    notifyAdminsAboutSale(order, createdItems).catch((err) => {
+      console.error('[POS ORDER] Error notifying admins:', err);
+    });
+
     return successResponse(
       {
         order,
         items: createdItems,
-        message: paymentMethod === 'CASH' 
-          ? 'Order paid and confirmed' 
+        message: paymentMethod === 'CASH'
+          ? 'Order paid and confirmed'
           : 'Order awaiting terminal payment confirmation'
       },
       201

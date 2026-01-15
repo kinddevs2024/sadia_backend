@@ -2,13 +2,16 @@ import { NextRequest } from 'next/server';
 import { getAllAsync } from '@/lib/db';
 import { requireRole } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { Product } from '@/types';
+import { Product, Inventory } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/pos/products
  * Returns only POS-активные товары с учётом оффлайн-цены
+ * 
+ * Search: Поиск работает по всем полям товара (название, описание, SKU, ID, цена, категория и т.д.)
+ * Кассир может ввести любое значение, связанное с товаром, и товар будет найден
  */
 export async function GET(req: NextRequest) {
   try {
@@ -22,24 +25,55 @@ export async function GET(req: NextRequest) {
     const hasStock = searchParams.get('has_stock') ?? 'true';
 
     let products = await getAllAsync<Product>('products');
+    const inventory = await getAllAsync<Inventory>('inventory');
+
+    // Вычисляем stock из inventory для каждого товара (сумма quantity по всем размерам)
+    const productStockMap = new Map<string, number>();
+    inventory.forEach((inv) => {
+      const currentStock = productStockMap.get(inv.productId) || 0;
+      productStockMap.set(inv.productId, currentStock + (inv.quantity || 0));
+    });
+
+    // Обновляем stock в товарах из inventory
+    products = products.map((p) => ({
+      ...p,
+      stock: productStockMap.get(p.id) ?? p.stock ?? 0,
+    }));
 
     // Только активные для POS, если не отключено
     if (activeOnly !== 'false') {
       products = products.filter(p => p.active_for_pos !== false);
     }
 
-    // Фильтр по остатку
+    // Фильтр по остатку (используем вычисленный stock из inventory)
     if (hasStock !== 'false') {
       products = products.filter(p => (p.stock ?? 0) > 0);
     }
 
-    // Поиск по названию или SKU
+    // Поиск по всем полям товара
     if (search) {
-      products = products.filter(
-        p =>
-          p.name.toLowerCase().includes(search) ||
-          p.sku?.toLowerCase().includes(search)
-      );
+      products = products.filter((p) => {
+        // Функция для безопасного преобразования значения в строку для поиска
+        const searchInField = (value: any): boolean => {
+          if (value === null || value === undefined) return false;
+          return String(value).toLowerCase().includes(search);
+        };
+
+        // Поиск по всем текстовым полям товара
+        return (
+          searchInField(p.name) ||
+          searchInField(p.slug) ||
+          searchInField(p.description) ||
+          searchInField(p.sku) ||
+          searchInField(p.id) ||
+          searchInField(p.price) ||
+          searchInField(p.costPrice) ||
+          searchInField(p.profit) ||
+          searchInField(p.offline_price) ||
+          searchInField(p.categoryId) ||
+          searchInField(p.stock)
+        );
+      });
     }
 
     // Пагинация

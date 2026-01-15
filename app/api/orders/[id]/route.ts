@@ -101,8 +101,14 @@ export async function PUT(
     const orderItems = allOrderItems.filter(item => item.orderId === params.id);
 
     // If status changed to PAID, decrease inventory
+    // Note: For ONLINE orders, inventory is already decreased when order is created
+    // So we only decrease for non-ONLINE orders or if order was created before this fix
     if (status === 'PAID' && currentOrder.status !== 'PAID') {
-      decreaseInventoryOnPayment(orderItems);
+      // Only decrease inventory if order source is not ONLINE (to avoid double decrease)
+      // For ONLINE orders, inventory is decreased at creation time
+      if (currentOrder.source !== 'ONLINE') {
+        decreaseInventoryOnPayment(orderItems);
+      }
     }
 
     // If status changed to COMPLETED, remove items from inventory completely

@@ -66,7 +66,7 @@ export interface Product {
   profit?: number;
   categoryId: string;
   images?: ProductImage[];
-  stock?: number;           // NEW: main stock quantity
+  stock?: number;           // DEPRECATED: Stock is now calculated from inventory. Use inventory collection instead.
   active_for_pos?: boolean; // NEW: visibility in POS (default: true)
   offline_price?: number | null; // NEW: optional offline-specific price
   sku?: string;             // NEW: barcode/SKU for scanning

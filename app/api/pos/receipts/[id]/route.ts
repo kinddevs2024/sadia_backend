@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getAll } from '@/lib/db';
+import { getByIdAsync, getAllAsync } from '@/lib/db';
 import { requireRole } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order, OrderItem, User } from '@/types';
@@ -37,8 +37,7 @@ export async function GET(
 
     const { id } = params;
 
-    const orders = getAll<Order>('orders');
-    const order = orders.find(o => o.id === id);
+    const order = await getByIdAsync<Order>('orders', id);
 
     if (!order) {
       return errorResponse('Order not found', 404);
@@ -50,12 +49,13 @@ export async function GET(
     }
 
     // Get order items
-    const orderItems = getAll<OrderItem>('orderItems').filter(oi => oi.orderId === order.id);
+    const allOrderItems = await getAllAsync<OrderItem>('orderItems');
+    const orderItems = allOrderItems.filter(oi => oi.orderId === order.id);
 
     // Get cashier details
     let cashierName = 'Cashier';
     if (order.cashier_id) {
-      const users = getAll<User>('users');
+      const users = await getAllAsync<User>('users');
       const cashier = users.find(u => u.id === order.cashier_id);
       if (cashier) {
         cashierName = `${cashier.firstName || ''} ${cashier.lastName || ''}`.trim() || cashier.email;
@@ -68,6 +68,7 @@ export async function GET(
       sku: item.sku,
       quantity: item.quantity,
       price: item.price,
+      size: item.size,
       subtotal: item.price * item.quantity
     }));
 
@@ -78,16 +79,10 @@ export async function GET(
 
     // Format date/time
     const orderDate = new Date(order.createdAt);
-    const dateStr = orderDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-    const timeStr = orderDate.toLocaleTimeString('en-US', {
+    const dateStr = orderDate.toLocaleDateString('ru-RU');
+    const timeStr = orderDate.toLocaleTimeString('ru-RU', {
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
+      minute: '2-digit'
     });
 
     return successResponse({
@@ -99,8 +94,8 @@ export async function GET(
       subtotal,
       tax,
       total,
-      payment_method: order.paymentMethod || order.payment_method,
-      payment_status: order.payment_status || order.status,
+      payment_method: order.payment_method || order.paymentMethod || 'CASH',
+      payment_status: order.payment_status || (order.status === 'PAID' ? 'paid' : 'pending'),
       terminal_transaction_id: order.terminal_transaction_id
     });
 

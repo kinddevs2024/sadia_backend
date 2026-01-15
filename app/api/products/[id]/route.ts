@@ -101,7 +101,6 @@ export async function PUT(
       categoryId,
       slug,
       sku,
-      stock,
       active_for_pos,
       offline_price,
     } = data;
@@ -123,7 +122,6 @@ export async function PUT(
       costPrice: nextCost,
       profit,
       sku: sku ?? existingProduct.sku,
-      stock: stock ?? existingProduct.stock ?? 0,
       active_for_pos: active_for_pos ?? existingProduct.active_for_pos ?? false,
       offline_price: offline_price ?? existingProduct.offline_price ?? null,
       updatedAt: new Date().toISOString(),

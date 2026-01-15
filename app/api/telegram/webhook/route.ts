@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { create, getAll, update } from '@/lib/db';
 import { Order, OrderItem, Product, Coupon } from '@/types';
+import { notifyAdminsAboutSale } from '@/lib/telegram-notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -106,6 +107,11 @@ export async function POST(req: NextRequest) {
       });
       orderItems.push(orderItem);
     }
+
+    // Notify admins about new sale
+    notifyAdminsAboutSale(order, orderItems).catch((err) => {
+      console.error('[TELEGRAM ORDER] Error notifying admins:', err);
+    });
 
     return successResponse({ order, items: orderItems }, 201);
   } catch (error: any) {

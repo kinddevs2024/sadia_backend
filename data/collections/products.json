@@ -1,47 +1,5 @@
 [
   {
-    "id": "1766824244958-abc123def",
-    "name": "авами",
-    "slug": "elegantnoe-platie-s-dlinnymi-rukavami",
-    "description": "Красивое платье для мусульманок с длинными рукавами и скромным декольте",
-    "price": 250000,
-    "costPrice": 160000,
-    "profit": 90000,
-    "categoryId": "1766824244956-7yut9bzfn",
-    "stock": 25,
-    "active_for_pos": true,
-    "sku": "PLT-001",
-    "images": [
-      {
-        "id": "1768226286865-pl61moj1l",
-        "url": "/uploads/IMG_1743.PNG",
-        "type": "image",
-        "order": 1,
-        "productId": "1766824244958-abc123def",
-        "createdAt": "2026-01-12T13:58:06.865Z"
-      },
-      {
-        "id": "1768227243961-iq3v29bvw",
-        "url": "/uploads/Crystal Clear Aero.jpg",
-        "type": "image",
-        "order": 2,
-        "productId": "1766824244958-abc123def",
-        "createdAt": "2026-01-12T14:14:03.961Z"
-      },
-      {
-        "id": "1768309068070-fs7vdgccf",
-        "url": "/uploads/Untitled video - Made with Clipchamp.mp4",
-        "type": "video",
-        "order": 3,
-        "productId": "1766824244958-abc123def",
-        "createdAt": "2026-01-13T12:57:48.070Z"
-      }
-    ],
-    "createdAt": "2025-12-27T08:30:45.000Z",
-    "updatedAt": "2026-01-13T12:58:23.674Z",
-    "offline_price": null
-  },
-  {
     "id": "1766824244958-def456ghi",
     "name": "Платье макси с цветочным принтом",
     "slug": "platie-maksi-s-tsvetochnym-printom",
@@ -50,7 +8,6 @@
     "costPrice": 200000,
     "profit": 120000,
     "categoryId": "1766824244956-7yut9bzfn",
-    "stock": 15,
     "active_for_pos": true,
     "sku": "PLT-002",
     "images": [
@@ -64,7 +21,7 @@
       }
     ],
     "createdAt": "2025-12-27T08:30:46.000Z",
-    "updatedAt": "2026-01-12T15:24:38.157Z"
+    "updatedAt": "2026-01-15T11:48:13.828Z"
   },
   {
     "id": "1766824244958-ghi789jkl",
@@ -75,7 +32,6 @@
     "costPrice": 170000,
     "profit": 110000,
     "categoryId": "1766824244956-7yut9bzfn",
-    "stock": 30,
     "active_for_pos": true,
     "sku": "PLT-003",
     "images": [],
@@ -90,7 +46,6 @@
     "costPrice": 90000,
     "profit": 60000,
     "categoryId": "1766824244956-tnw615agz",
-    "stock": 40,
     "active_for_pos": true,
     "sku": "BLZ-001",
     "images": [],
@@ -105,7 +60,6 @@
     "costPrice": 110000,
     "profit": 70000,
     "categoryId": "1766824244956-tnw615agz",
-    "stock": 20,
     "active_for_pos": true,
     "sku": "BLZ-002",
     "images": [],
@@ -120,7 +74,6 @@
     "costPrice": 140000,
     "profit": 80000,
     "categoryId": "1766824244956-tnw615agz",
-    "stock": 12,
     "active_for_pos": true,
     "sku": "BLZ-003",
     "images": [],
@@ -135,7 +88,6 @@
     "costPrice": 40000,
     "profit": 40000,
     "categoryId": "1766824244957-2ccpo2gac",
-    "stock": 50,
     "active_for_pos": true,
     "sku": "ACC-001",
     "images": [],
@@ -150,7 +102,6 @@
     "costPrice": 250000,
     "profit": 100000,
     "categoryId": "1766824244957-2ccpo2gac",
-    "stock": 8,
     "active_for_pos": true,
     "sku": "ACC-002",
     "images": [],
@@ -165,7 +116,6 @@
     "costPrice": 70000,
     "profit": 50000,
     "categoryId": "1766824244957-2ccpo2gac",
-    "stock": 35,
     "active_for_pos": true,
     "sku": "ACC-003",
     "images": [],
@@ -180,7 +130,6 @@
     "costPrice": 180000,
     "profit": 110000,
     "categoryId": "1766824244956-7yut9bzfn",
-    "stock": 18,
     "active_for_pos": true,
     "sku": "PLT-004",
     "createdAt": "2025-12-27T08:30:54.000Z"
@@ -194,10 +143,10 @@
     "costPrice": 120000,
     "profit": 75000,
     "categoryId": "1766824244956-tnw615agz",
-    "stock": 22,
     "active_for_pos": true,
     "sku": "BLZ-004",
-    "createdAt": "2025-12-27T08:30:55.000Z"
+    "createdAt": "2025-12-27T08:30:55.000Z",
+    "updatedAt": "2026-01-15T12:08:25.836Z"
   },
   {
     "id": "1766824244958-jkl456mno",
@@ -208,9 +157,49 @@
     "costPrice": 320000,
     "profit": 130000,
     "categoryId": "1766824244957-2ccpo2gac",
-    "stock": 6,
     "active_for_pos": true,
     "sku": "ACC-004",
     "createdAt": "2025-12-27T08:30:56.000Z"
+  },
+  {
+    "id": "1768480591260-p2onq1yg8",
+    "name": "aaa",
+    "slug": "aaa",
+    "description": "aaaa",
+    "price": 200000,
+    "costPrice": 100000,
+    "profit": 100000,
+    "categoryId": "1766824244956-tnw615agz",
+    "sku": "20010",
+    "active_for_pos": true,
+    "offline_price": 210000,
+    "createdAt": "2026-01-15T12:36:31.260Z",
+    "images": [
+      {
+        "id": "1768480602906-5o8ro0z1f",
+        "url": "/uploads/IMG_1743.PNG",
+        "type": "image",
+        "order": 0,
+        "productId": "1768480591260-p2onq1yg8",
+        "createdAt": "2026-01-15T12:36:42.906Z"
+      },
+      {
+        "id": "1768480606366-8brpjnvnc",
+        "url": "/uploads/IMG_1648.PNG",
+        "type": "image",
+        "order": 1,
+        "productId": "1768480591260-p2onq1yg8",
+        "createdAt": "2026-01-15T12:36:46.366Z"
+      },
+      {
+        "id": "1768480611383-juj7s09gf",
+        "url": "/uploads/IMG_1745.PNG",
+        "type": "image",
+        "order": 2,
+        "productId": "1768480591260-p2onq1yg8",
+        "createdAt": "2026-01-15T12:36:51.383Z"
+      }
+    ],
+    "updatedAt": "2026-01-15T12:36:51.383Z"
   }
 ]

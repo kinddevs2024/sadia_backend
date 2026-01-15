@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 import { authenticate, requireRole } from '@/middleware/auth';
 import { getByIdAsync, getAllAsync } from '@/lib/db';
-import { Product } from '@/types';
+import { Product, Inventory } from '@/types';
 
 /**
  * GET /api/pos/qrcode/:productId
@@ -169,9 +169,22 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if product is available for POS
-    if (product.active_for_pos === false || (product.stock !== undefined && product.stock <= 0)) {
+    if (product.active_for_pos === false) {
       return NextResponse.json(
         { success: false, message: 'Product not available for POS' },
+        { status: 409 }
+      );
+    }
+
+    // Calculate stock from inventory (sum of all sizes)
+    const inventory = await getAllAsync<Inventory>('inventory');
+    const productStock = inventory
+      .filter(inv => inv.productId === product.id)
+      .reduce((sum, inv) => sum + (inv.quantity || 0), 0);
+
+    if (productStock <= 0) {
+      return NextResponse.json(
+        { success: false, message: 'Product not available for POS (out of stock)' },
         { status: 409 }
       );
     }
@@ -184,7 +197,7 @@ export async function POST(req: NextRequest) {
         id: product.id,
         name: product.name,
         price,
-        stock: product.stock ?? 0,
+        stock: productStock,
         sku: product.sku,
         categoryId: product.categoryId,
         offline_price: product.offline_price,

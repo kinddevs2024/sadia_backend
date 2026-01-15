@@ -3,7 +3,8 @@ import { getAllAsync, createAsync, getByIdAsync, updateAsync } from '@/lib/db';
 import { requireAuth, requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Order, OrderItem, Product, Coupon } from '@/types';
-import { sendTelegramNotificationByPhone } from '@/lib/telegram-notify';
+import { sendTelegramNotificationByPhone, notifyAdminsAboutSale } from '@/lib/telegram-notify';
+import { decreaseInventoryOnPayment, atomicDecreaseStock } from '@/lib/inventory-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -213,8 +214,32 @@ export async function POST(req: NextRequest) {
         size: item.size,
         quantity: item.quantity,
         price: product.price,
+        product_name: product.name,
       });
       orderItems.push(orderItem);
+    }
+
+    // Decrease inventory when order is created (reserve stock)
+    // This ensures stock is reserved immediately for online orders
+    if (source === 'ONLINE') {
+      // Decrease inventory by size (if size is specified)
+      decreaseInventoryOnPayment(orderItems);
+      
+      // Also decrease general product stock for compatibility
+      for (const item of items) {
+        const result = atomicDecreaseStock(
+          item.productId,
+          item.quantity,
+          'purchase',
+          user.id,
+          order.id
+        );
+        
+        if (!result.success) {
+          console.warn(`Failed to decrease stock for product ${item.productId}: ${result.error}`);
+          // Don't fail the order, but log the warning
+        }
+      }
     }
 
     // Send Telegram notification if phone is provided and order is from website
@@ -235,6 +260,11 @@ export async function POST(req: NextRequest) {
         console.error('[ORDER] Error sending Telegram notification:', err);
       });
     }
+
+    // Notify admins about new sale
+    notifyAdminsAboutSale(order, orderItems).catch((err) => {
+      console.error('[ORDER] Error notifying admins:', err);
+    });
 
     return successResponse({ order, items: orderItems }, 201);
   } catch (error: any) {

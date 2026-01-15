@@ -158,7 +158,6 @@ export async function POST(req: NextRequest) {
       categoryId,
       slug,
       sku,
-      stock,
       active_for_pos,
       offline_price,
     } = data;
@@ -180,7 +179,6 @@ export async function POST(req: NextRequest) {
       profit,
       categoryId,
       sku,
-      stock: stock ?? 0,
       active_for_pos: active_for_pos ?? false,
       offline_price: offline_price ?? null,
       createdAt: new Date().toISOString(),
