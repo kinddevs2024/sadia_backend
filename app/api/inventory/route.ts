@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getAllAsync, createAsync } from '@/lib/db';
+import { getAllAsync, createAsync, clearCache } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Inventory, Product } from '@/types';
@@ -88,6 +88,28 @@ export async function POST(req: NextRequest) {
       quantity: parseInt(quantity.toString()),
       updatedAt: new Date().toISOString(),
     });
+
+    // Clear cache to ensure fresh data on next read
+    clearCache('inventory');
+
+    // Debug logging
+    console.log(`Created inventory item:`, {
+      id: inventoryItem.id,
+      productId: inventoryItem.productId,
+      size: inventoryItem.size,
+      quantity: inventoryItem.quantity,
+    });
+
+    // Verify it was saved by reading it back
+    const allInventory = await getAllAsync<Inventory>('inventory');
+    console.log(`Total inventory items after creation: ${allInventory.length}`);
+    const matchingItems = allInventory.filter(inv => inv.productId === productId);
+    console.log(`Inventory items for product ${productId}: ${matchingItems.length}`);
+    if (matchingItems.length > 0) {
+      console.log(`Matching inventory items:`, matchingItems.map(inv => ({ id: inv.id, size: inv.size, quantity: inv.quantity })));
+    } else {
+      console.warn(`⚠️ No inventory items found for product ${productId} after creation!`);
+    }
 
     return successResponse(inventoryItem, 201);
   } catch (error: any) {

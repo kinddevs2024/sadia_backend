@@ -175,11 +175,20 @@ async function readCollection<T>(collection: string): Promise<T[]> {
 async function writeCollection<T>(collection: string, items: T[]): Promise<void> {
   if (USE_BLOB) {
     await writeCollectionBlob<T>(collection, items);
-    // Update cache
+    // Update cache immediately after write
     cache.set(collection, { data: items, timestamp: Date.now() });
+    console.log(`Updated cache for collection ${collection} with ${items.length} items`);
   } else {
     writeCollectionFS<T>(collection, items);
   }
+}
+
+/**
+ * Clear cache for a specific collection (useful for forcing refresh)
+ */
+export function clearCache(collection: string): void {
+  cache.delete(collection);
+  blobUrlCache.delete(`db/${collection}.json`);
 }
 
 /**

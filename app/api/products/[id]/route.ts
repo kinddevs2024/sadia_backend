@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { getByIdAsync, updateAsync, removeAsync, getAllAsync } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { Product, Category } from '@/types';
+import { Product, Category, Inventory } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,12 +71,20 @@ export async function GET(
     const categories = await getAllAsync<Category>('categories');
     const category = categories.find(cat => cat.id === product.categoryId) || null;
 
+    // Populate inventory
+    const inventory = await getAllAsync<Inventory>('inventory');
+    const productInventory = inventory.filter(inv => inv.productId === product.id);
+    
+    // Debug logging
+    console.log(`Product ${product.id} - Total inventory items: ${inventory.length}, Product inventory: ${productInventory.length}`);
+
     // Populate images
     const images = product.images || [];
 
     return successResponse({
       ...product,
       category,
+      inventory: productInventory,
       images: images.sort((a, b) => (a.order || 0) - (b.order || 0)),
     });
   } catch (error: any) {

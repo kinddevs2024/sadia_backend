@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getByIdAsync, updateAsync, removeAsync, getAllAsync } from '@/lib/db';
+import { getByIdAsync, updateAsync, removeAsync, getAllAsync, clearCache } from '@/lib/db';
 import { requireAdmin } from '@/middleware/auth';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { Inventory, Product } from '@/types';
@@ -82,6 +82,9 @@ export async function PUT(
       return errorResponse('Inventory item not found', 404);
     }
 
+    // Clear cache to ensure fresh data on next read
+    clearCache('inventory');
+
     return successResponse(updatedItem);
   } catch (error: any) {
     if (error.message === 'Unauthorized' || error.message === 'Forbidden') {
@@ -104,6 +107,9 @@ export async function DELETE(
     if (!deleted) {
       return errorResponse('Inventory item not found', 404);
     }
+
+    // Clear cache to ensure fresh data on next read
+    clearCache('inventory');
 
     return successResponse({ message: 'Inventory item deleted successfully' });
   } catch (error: any) {

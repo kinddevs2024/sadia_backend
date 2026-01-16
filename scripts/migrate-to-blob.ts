@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getAllAsync } from '../lib/db';
-import { put } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 const COLLECTIONS_DIR = path.join(process.cwd(), 'data', 'collections');
 
@@ -60,13 +60,45 @@ async function migrateCollection(collection: string) {
     const content = JSON.stringify(items, null, 2);
     
     try {
-      await put(blobName, content, {
+      // Try to use allowOverwrite if available (v1.0.0+), otherwise delete old blobs first
+      const putOptions: any = {
         access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false,
-        allowOverwrite: true, // Overwrite if exists
-      });
-      console.log(`✅ Migrated ${items.length} items from ${collection} to Blob Storage`);
+      };
+
+      try {
+        // Try to use allowOverwrite (available in v1.0.0+)
+        putOptions.allowOverwrite = true;
+        await put(blobName, content, putOptions);
+        console.log(`✅ Migrated ${items.length} items from ${collection} to Blob Storage`);
+      } catch (error: any) {
+        // If allowOverwrite is not supported (v0.26.0), delete old blobs first
+        if (error.message?.includes('allowOverwrite') || error.message?.includes('overwrite')) {
+          console.log(`   allowOverwrite not supported, using delete-then-create approach for ${collection}`);
+          
+          // Delete existing blobs with the same pathname
+          try {
+            const blobs = await list({ prefix: blobName });
+            const existingBlobs = blobs.blobs.filter(b => b.pathname === blobName);
+            
+            if (existingBlobs.length > 0) {
+              const urlsToDelete = existingBlobs.map(b => b.url);
+              await del(urlsToDelete);
+              console.log(`   Deleted ${existingBlobs.length} existing blob(s) for ${collection}`);
+            }
+          } catch (listError) {
+            // Ignore list errors, continue with creation
+          }
+          
+          // Create new blob without allowOverwrite
+          delete putOptions.allowOverwrite;
+          await put(blobName, content, putOptions);
+          console.log(`✅ Migrated ${items.length} items from ${collection} to Blob Storage`);
+        } else {
+          throw error;
+        }
+      }
     } catch (error: any) {
       console.error(`   Error writing to Blob Storage:`, error.message);
       throw error;

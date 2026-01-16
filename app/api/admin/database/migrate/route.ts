@@ -4,7 +4,7 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import fs from 'fs';
 import path from 'path';
 import { getAllAsync } from '@/lib/db';
-import { put } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 const COLLECTIONS_DIR = path.join(process.cwd(), 'data', 'collections');
 
@@ -73,13 +73,42 @@ export async function POST(req: NextRequest) {
         const content = JSON.stringify(items, null, 2);
         
         try {
-          await put(blobName, content, {
+          // Try to use allowOverwrite if available (v1.0.0+), otherwise delete old blobs first
+          const putOptions: any = {
             access: 'public',
             contentType: 'application/json',
             addRandomSuffix: false,
-            allowOverwrite: true, // Overwrite if exists
-          });
-          results[collection] = { migrated: items.length, total: items.length, skipped: false };
+          };
+
+          try {
+            // Try to use allowOverwrite (available in v1.0.0+)
+            putOptions.allowOverwrite = true;
+            await put(blobName, content, putOptions);
+            results[collection] = { migrated: items.length, total: items.length, skipped: false };
+          } catch (error: any) {
+            // If allowOverwrite is not supported (v0.26.0), delete old blobs first
+            if (error.message?.includes('allowOverwrite') || error.message?.includes('overwrite')) {
+              // Delete existing blobs with the same pathname
+              try {
+                const blobs = await list({ prefix: blobName });
+                const existingBlobs = blobs.blobs.filter(b => b.pathname === blobName);
+                
+                if (existingBlobs.length > 0) {
+                  const urlsToDelete = existingBlobs.map(b => b.url);
+                  await del(urlsToDelete);
+                }
+              } catch (listError) {
+                // Ignore list errors, continue with creation
+              }
+              
+              // Create new blob without allowOverwrite
+              delete putOptions.allowOverwrite;
+              await put(blobName, content, putOptions);
+              results[collection] = { migrated: items.length, total: items.length, skipped: false };
+            } else {
+              throw error;
+            }
+          }
         } catch (error: any) {
           results[collection] = { 
             migrated: 0, 
