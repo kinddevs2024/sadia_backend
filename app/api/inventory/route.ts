@@ -92,23 +92,22 @@ export async function POST(req: NextRequest) {
     // Clear cache to ensure fresh data on next read
     clearCache('inventory');
 
-    // Debug logging
-    console.log(`Created inventory item:`, {
-      id: inventoryItem.id,
-      productId: inventoryItem.productId,
-      size: inventoryItem.size,
-      quantity: inventoryItem.quantity,
-    });
+    // Debug logging only in development
+    const DEBUG = process.env.DEBUG_DB === 'true' || process.env.NODE_ENV === 'development';
+    if (DEBUG) {
+      console.log(`Created inventory item:`, {
+        id: inventoryItem.id,
+        productId: inventoryItem.productId,
+        size: inventoryItem.size,
+        quantity: inventoryItem.quantity,
+      });
 
-    // Verify it was saved by reading it back
-    const allInventory = await getAllAsync<Inventory>('inventory');
-    console.log(`Total inventory items after creation: ${allInventory.length}`);
-    const matchingItems = allInventory.filter(inv => inv.productId === productId);
-    console.log(`Inventory items for product ${productId}: ${matchingItems.length}`);
-    if (matchingItems.length > 0) {
-      console.log(`Matching inventory items:`, matchingItems.map(inv => ({ id: inv.id, size: inv.size, quantity: inv.quantity })));
-    } else {
-      console.warn(`⚠️ No inventory items found for product ${productId} after creation!`);
+      // Verify it was saved by reading it back (only in debug mode)
+      const allInventory = await getAllAsync<Inventory>('inventory');
+      const matchingItems = allInventory.filter(inv => inv.productId === productId);
+      if (matchingItems.length === 0) {
+        console.warn(`⚠️ No inventory items found for product ${productId} after creation!`);
+      }
     }
 
     return successResponse(inventoryItem, 201);
