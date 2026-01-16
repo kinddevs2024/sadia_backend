@@ -60,10 +60,17 @@ async function readCollectionBlob<T>(collection: string): Promise<T[]> {
     // If not in cache, search for it
     if (!blobUrl) {
       const blobs = await list({ prefix: blobName });
-      const matchingBlob = blobs.blobs.find(b => b.pathname === blobName);
-      if (!matchingBlob) {
+      // Find the most recent blob with exact pathname match
+      const matchingBlobs = blobs.blobs
+        .filter(b => b.pathname === blobName)
+        .sort((a, b) => (b.uploadedAt?.getTime() || 0) - (a.uploadedAt?.getTime() || 0));
+      
+      if (matchingBlobs.length === 0) {
         return [];
       }
+      
+      // Use the most recent blob (first in sorted array)
+      const matchingBlob = matchingBlobs[0];
       blobUrl = matchingBlob.url;
       blobUrlCache.set(blobName, blobUrl);
     }
@@ -96,6 +103,8 @@ async function writeCollectionBlob<T>(collection: string, items: T[]): Promise<v
     const { url } = await put(blobName, content, {
       access: 'public',
       contentType: 'application/json',
+      addRandomSuffix: false, // Keep the same filename
+      allowOverwrite: true, // Overwrite existing blob instead of creating new one
     });
     // Cache the URL for faster reads
     blobUrlCache.set(blobName, url);
